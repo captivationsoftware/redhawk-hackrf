@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE deviceconfiguration PUBLIC "-//JTRS//DTD SCA V2.2.2 DCD//EN" "deviceconfiguration.dtd">
+<deviceconfiguration id="DCE:40517d66-8344-4b38-a52a-8dae8b3c5401" name="captivation.HackRFNode">
+  <devicemanagersoftpkg>
+    <localfile name="/mgr/DeviceManager.spd.xml"/>
+  </devicemanagersoftpkg>
+  <componentfiles>
+    <componentfile id="HackRFOne_5a7a2dc0-6d2f-4a6f-8ae7-1db4dd577e9a" type="SPD">
+      <localfile name="/devices/captivation/HackRFOne/HackRFOne.spd.xml"/>
+    </componentfile>
+  </componentfiles>
+  <partitioning>
+    <componentplacement>
+      <componentfileref refid="HackRFOne_5a7a2dc0-6d2f-4a6f-8ae7-1db4dd577e9a"/>
+      <componentinstantiation id="captivation.HackRFNode:HackRFOne_1">
+        <usagename>HackRFOne_1</usagename>
+      </componentinstantiation>
+    </componentplacement>
+  </partitioning>
+  <domainmanager>
+    <namingservice name="REDHAWK_DEV/REDHAWK_DEV"/>
+  </domainmanager>
+</deviceconfiguration>

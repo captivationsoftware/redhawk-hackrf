@@ -1,0 +1,14 @@
+.deps/
+HackRFOne-HackRFOne_base.o
+HackRFOne-main.o
+HackRFOne-template_impl.o
+Makefile
+Makefile.in
+aclocal.m4
+autom4te.cache/
+config.*
+configure
+depcomp
+install-sh
+missing
+

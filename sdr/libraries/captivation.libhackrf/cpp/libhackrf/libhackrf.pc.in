@@ -1,0 +1,10 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: HackRF Library
+Description: C Utility Library
+Version: @VERSION@
+Cflags: -I${includedir} -I${includedir}/libhackrf -I/usr/include/libusb-1.0
+Libs: -L${libdir} -lhackrf

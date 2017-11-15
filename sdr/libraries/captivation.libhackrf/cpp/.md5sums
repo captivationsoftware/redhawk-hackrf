@@ -1,0 +1,8 @@
+9e9c9bf983917046a119f512aa371a0c  src/libhackrf.cpp
+ee8eaad7da1d4af25d204785c96600e6  include/libhackrf.h
+8bfcd22353c3a57fee561ad86ee2a56b  reconf
+980dde797c0ca35cd578c74623d6c66d  configure.ac
+8f79a5c9bfb27235ddbbaf19bc11f3b2  Makefile.am
+b2c5cac350738b09c35faf2916cf29c1  Makefile.am.ide
+2b2faa5cfc83438427491f4be5d6ee59  build.sh
+8ea7fc82e27e3d7ac6cb378d9434e537  captivation.libhackrf.pc.in
