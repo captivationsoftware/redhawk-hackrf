@@ -1,3 +1,5 @@
+HackRFOne
+*.o
 .deps/
 HackRFOne-HackRFOne_base.o
 HackRFOne-main.o
