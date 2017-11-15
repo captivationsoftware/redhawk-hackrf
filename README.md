@@ -2,9 +2,9 @@
 Drivers for interfacing HackRF radios with REDHAWK
 
 # Contents
-...1. REDHAWK Softpkg Dependency (captivation.libhackrf)
-...2. REDHAWK Device (captivation.HackRFOne)
-...3. REDHAWK Node (captivation.HackRFNode)
+... REDHAWK Softpkg Dependency (captivation.libhackrf)
+... REDHAWK Device (captivation.HackRFOne)
+... REDHAWK Node (captivation.HackRFNode)
 
 # Instructions
 To install into standard SDRROOT directory:
