@@ -13,8 +13,8 @@ OSSIE_SDRROOT_AS_PREFIX
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 # Dependencies
-PKG_CHECK_MODULES([PROJECTDEPS], [ossie >= 2.1 omniORB4 >= 4.1.0])
-PKG_CHECK_MODULES([INTERFACEDEPS], [frontend >= 2.4, bulkio >= 2.1])
+PKG_CHECK_MODULES([PROJECTDEPS], [ossie >= 2.0 omniORB4 >= 4.1.0])
+PKG_CHECK_MODULES([INTERFACEDEPS], [frontend >= 2.2, bulkio >= 2.0])
 RH_SOFTPKG_CXX([/deps/captivation/libhackrf/libhackrf.spd.xml])
 OSSIE_ENABLE_LOG4CXX
 AX_BOOST_BASE([1.41])

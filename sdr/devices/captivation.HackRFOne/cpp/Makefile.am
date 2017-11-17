@@ -1,12 +1,13 @@
+ossieName = captivation.HackRFOne
+bindir = $(prefix)/dev/devices/captivation/HackRFOne/cpp/
+bin_PROGRAMS = HackRFOne
+
+xmldir = $(prefix)/dev/devices/captivation/HackRFOne/
+dist_xml_DATA = ../HackRFOne.scd.xml ../HackRFOne.prf.xml ../HackRFOne.spd.xml
 ACLOCAL_AMFLAGS = -I m4 -I${OSSIEHOME}/share/aclocal/ossie
 AUTOMAKE_OPTIONS = subdir-objects
 
-ossieName = captivation.HackRFOne
-bindir = $(prefix)/dev/devices/captivation/HackRFOne/cpp
-bin_PROGRAMS = HackRFOne
 
-xmldir = $(prefix)/dev/devices/captivation/HackRFOne
-dist_xml_DATA = ../HackRFOne.scd.xml ../HackRFOne.prf.xml ../HackRFOne.spd.xml
 
 distclean-local:
 	rm -rf m4

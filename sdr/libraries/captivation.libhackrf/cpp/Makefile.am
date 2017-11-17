@@ -30,5 +30,5 @@ libhackrf_la_LIBADD = $(SOFTPKG_LIBS) $(REDHAWK_LIBS) $(LIBUSB_LIBS)
 libhackrf_la_CPPFLAGS = -I $(srcdir)/include $(SOFTPKG_CFLAGS) $(REDHAWK_CFLAGS) $(LIBUSB_CFLAGS) $(BOOST_CPPFLAGS)
 libhackrf_la_CXXFLAGS = -Wall
 
-redhawk_HEADERS_auto ?= $(filter libhackrf/src/%.h,$(redhawk_SOURCES_auto))
+redhawk_HEADERS_auto ?= $(filter include/%,$(redhawk_SOURCES_auto))
 include_HEADERS = $(redhawk_HEADERS_auto)

@@ -15,3 +15,12 @@ To clean project:
 ```bash
 make distclean
 ```
+
+To run the HackRF device:
+```bash
+# Launch REDHAWK domain (if necessary)
+nodeBooter -D&
+
+# Launch node containing HackRF device
+sudo make check
+```

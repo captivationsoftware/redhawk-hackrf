@@ -40,15 +40,15 @@ HackRFOne_base::HackRFOne_base(char *devMgr_ior, char *id, char *lbl, char *sftw
 
 HackRFOne_base::~HackRFOne_base()
 {
-    RFInfo_in->_remove_ref();
+    delete RFInfo_in;
     RFInfo_in = 0;
-    DigitalTuner_in->_remove_ref();
+    delete DigitalTuner_in;
     DigitalTuner_in = 0;
-    dataOctetTX_in->_remove_ref();
+    delete dataOctetTX_in;
     dataOctetTX_in = 0;
-    dataOctet_out->_remove_ref();
+    delete dataOctet_out;
     dataOctet_out = 0;
-    RFInfoTX_out->_remove_ref();
+    delete RFInfoTX_out;
     RFInfoTX_out = 0;
 }
 
@@ -119,6 +119,29 @@ void HackRFOne_base::loadProperties()
                 "external",
                 "property");
 
+}
+
+/* This sets the number of entries in the frontend_tuner_status struct sequence property
+ * as well as the tuner_allocation_ids vector. Call this function during initialization
+ */
+void HackRFOne_base::setNumChannels(size_t num)
+{
+    this->setNumChannels(num, "RX_DIGITIZER");
+}
+/* This sets the number of entries in the frontend_tuner_status struct sequence property
+ * as well as the tuner_allocation_ids vector. Call this function during initialization
+ */
+
+void HackRFOne_base::setNumChannels(size_t num, std::string tuner_type)
+{
+    frontend_tuner_status.clear();
+    frontend_tuner_status.resize(num);
+    tuner_allocation_ids.clear();
+    tuner_allocation_ids.resize(num);
+    for (std::vector<frontend_tuner_status_struct_struct>::iterator iter=frontend_tuner_status.begin(); iter!=frontend_tuner_status.end(); iter++) {
+        iter->enabled = false;
+        iter->tuner_type = tuner_type;
+    }
 }
 
 void HackRFOne_base::frontendTunerStatusChanged(const std::vector<frontend_tuner_status_struct_struct>* oldValue, const std::vector<frontend_tuner_status_struct_struct>* newValue)
@@ -192,10 +215,10 @@ void HackRFOne_base::removeListener(const std::string& listen_alloc_id)
     ExtendedCF::UsesConnectionSequence_var tmp;
     // Check to see if port "dataOctet_out" has a connection for this listener
     tmp = this->dataOctet_out->connections();
-    for (unsigned int i=0; i<this->dataOctet_out->connections()->length(); i++) {
-        std::string connection_id = ossie::corba::returnString(tmp[i].connectionId);
+    for (unsigned int i=0; i<tmp->length(); i++) {
+        const char* connection_id = tmp[i].connectionId;
         if (connection_id == listen_alloc_id) {
-            this->dataOctet_out->disconnectPort(connection_id.c_str());
+            this->dataOctet_out->disconnectPort(connection_id);
         }
     }
     this->connectionTableChanged(&old_table, &this->connectionTable);

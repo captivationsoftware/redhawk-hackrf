@@ -18,15 +18,11 @@ typedef bulkio::connection_descriptor_struct connection_descriptor_struct;
 struct frontend_tuner_status_struct_struct : public frontend::default_frontend_tuner_status_struct_struct {
     frontend_tuner_status_struct_struct () : frontend::default_frontend_tuner_status_struct_struct()
     {
-    }
+    };
 
     static std::string getId() {
         return std::string("FRONTEND::tuner_status_struct");
-    }
-
-    static const char* getFormat() {
-        return "sssssddbdssdbbs";
-    }
+    };
 
     std::string available_bandwidth;
     std::string available_frequency;

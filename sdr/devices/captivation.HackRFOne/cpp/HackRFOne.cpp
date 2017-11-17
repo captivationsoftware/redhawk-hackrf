@@ -57,16 +57,35 @@ void HackRFOne_i::constructor()
      The incoming request for tuning contains a string describing the requested tuner
      type. The string for the request must match the string in the tuner status.
     ***********************************************************************************/
+	reset();
+    start();
+}
 
-   bool deviceReady = resetDriver();
-    if (deviceReady) {
-       this->addChannels(1, "RX_DIGITIZER");
-       this->addChannels(1, "TX");
+void HackRFOne_i::addChannels(size_t num, const std::string& tunerType) {
+    frontend_tuner_status.resize(frontend_tuner_status.size()+num);
+    tuner_allocation_ids.resize(tuner_allocation_ids.size()+num);
+    for (std::vector<frontend_tuner_status_struct_struct>::reverse_iterator iter=frontend_tuner_status.rbegin();
+    																		iter!=frontend_tuner_status.rbegin()+num;
+    																		iter++) {
+        iter->enabled = false;
+        iter->tuner_type = tunerType;
     }
 }
 
-bool HackRFOne_i::resetDriver() {
+bool HackRFOne_i::reset() {
+	// Reset the available tuners
+	this->setNumChannels(0);
 
+	// Attempt to release (if loaded) and re-acquire HackRF device
+    bool deviceReady = resetDriver();
+    if (deviceReady) {
+    	this->addChannels(1, "RX_DIGITIZER");
+    	this->addChannels(1, "TX");
+    }
+    return deviceReady;
+}
+
+bool HackRFOne_i::resetDriver() {
    int status = HACKRF_SUCCESS;
    if (_device != NULL) {
       status = hackrf_close(_device);
@@ -98,6 +117,21 @@ bool HackRFOne_i::resetDriver() {
                        hackrf_error_name(static_cast<hackrf_error>(status)));
       return false;
    }
+
+   read_partid_serialno_t serial;
+   status = hackrf_board_partid_serialno_read(_device, &serial);
+   if (status != HACKRF_SUCCESS) {
+      LOG_WARN(HackRFOne_i, "Error while determing device serial number - Reason: " <<
+                       hackrf_error_name(static_cast<hackrf_error>(status)));
+      return false;
+   }
+
+   LOG_INFO(HackRFOne_i, "Successfully opened HackRF device: " << serial.part_id[0] << "-"
+		                                                       << serial.part_id[1] << ":"
+															   << serial.serial_no[0] << "-"
+															   << serial.serial_no[1] << "-"
+															   << serial.serial_no[2] << "-"
+															   << serial.serial_no[3]);
 
    return true;
 }
@@ -346,6 +380,16 @@ int HackRFOne_i::serviceFunction()
 {
     LOG_DEBUG(HackRFOne_i, "serviceFunction() example log message");
 
+    if (_device) {
+    	// Validate _device is still available
+    	std::string versionStr(' ', 100);
+    	int status = hackrf_version_string_read(_device, &versionStr[0], versionStr.size());
+    	if (status != HACKRF_SUCCESS) {
+    		reset();
+    	}
+    } else {
+    	reset();
+    }
     return NOOP;
 }
 

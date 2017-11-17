@@ -1,4 +1,4 @@
-.PHONY: all install clean distclean
+.PHONY: all install clean distclean check
 
 all:
 	(cd sdr/libraries/captivation.libhackrf/cpp && ./reconf; ./configure; make -j2)
@@ -7,7 +7,8 @@ all:
 install:
 	(cd sdr/libraries/captivation.libhackrf/cpp && ./reconf; ./configure; make install -j2)
 	(cd sdr/devices/captivation.HackRFOne/cpp && ./reconf; ./configure; make install -j2)
-	(cp -r sdr/nodes/* /var/redhawk/sdr/dev/nodes/)
+	mkdir -p /var/redhawk/sdr/dev/nodes/captivation/
+	cp -r sdr/nodes/captivation.HackRFNode /var/redhawk/sdr/dev/nodes/captivation/HackRFNode
 
 clean:
 	(cd sdr/libraries/captivation.libhackrf/cpp && make clean)
@@ -16,3 +17,7 @@ clean:
 distclean:
 	(cd sdr/libraries/captivation.libhackrf/cpp && make distclean)
 	(cd sdr/devices/captivation.HackRFOne/cpp && make distclean)
+
+check:
+	@echo "Warn: 'sudo' permissions may be necessary for device to access USB"
+	./scripts/launch_hackrf.sh

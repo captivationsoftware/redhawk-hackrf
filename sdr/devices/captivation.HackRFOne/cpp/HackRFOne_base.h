@@ -57,6 +57,9 @@ class HackRFOne_base : public frontend::FrontendTunerDevice<frontend_tuner_statu
 
         std::map<std::string, std::string> listeners;
 
+        virtual void setNumChannels(size_t num);
+        virtual void setNumChannels(size_t num, std::string tuner_type);
+
     private:
         void construct();
 };

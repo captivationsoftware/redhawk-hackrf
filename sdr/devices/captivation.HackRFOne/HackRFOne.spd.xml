@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softpkg PUBLIC "-//JTRS//DTD SCA V2.2.2 SPD//EN" "softpkg.dtd">
-<softpkg id="DCE:5fa5c822-25e0-4500-974e-54ddd1a268ad" name="captivation.HackRFOne" type="2.1.1">
+<softpkg id="DCE:5fa5c822-25e0-4500-974e-54ddd1a268ad" name="captivation.HackRFOne" type="2.0.7">
   <title></title>
   <author>
     <name>null</name>

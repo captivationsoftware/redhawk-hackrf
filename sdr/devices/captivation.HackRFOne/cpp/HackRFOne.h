@@ -17,7 +17,11 @@ class HackRFOne_i : public HackRFOne_base
 
         void constructor();
 
+        bool reset();
+
         bool resetDriver();
+
+        void addChannels(size_t num, const std::string& tunerType);
 
         int serviceFunction();
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softpkg PUBLIC "-//JTRS//DTD SCA V2.2.2 SPD//EN" "softpkg.dtd">
-<softpkg id="DCE:cbad3792-3515-47ba-a551-0d96365a504d" name="captivation.libhackrf" type="2.1.1">
+<softpkg id="DCE:cbad3792-3515-47ba-a551-0d96365a504d" name="captivation.libhackrf" type="2.0.7">
   <author/>
   <implementation id="cpp">
     <description>The implementation contains descriptive information about the template for a software resource.</description>

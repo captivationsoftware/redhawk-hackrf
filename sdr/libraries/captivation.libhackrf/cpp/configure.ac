@@ -1,4 +1,4 @@
-AC_INIT(captivation.libhackrf, 0.5)
+AC_INIT(captivation.libhackrf, 1.0.0)
 AM_INIT_AUTOMAKE([nostdinc foreign])
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -10,13 +10,11 @@ LT_INIT([disable-static])
 AC_CORBA_ORB
 OSSIE_CHECK_OSSIE
 RH_SOFTPKG_PREFIX([captivation.libhackrf],[cpp])
-#prefix=`echo ${prefix///dom//dev}`
-#exec_prefix=`echo ${exec_prefix///dom//dev}`
 
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 # Dependencies
-PKG_CHECK_MODULES([REDHAWK], [ossie >= 2.1])
+PKG_CHECK_MODULES([REDHAWK], [ossie >= 2.0])
 PKG_CHECK_MODULES([LIBUSB], [libusb-1.0 >= 0.27.1])
 OSSIE_ENABLE_LOG4CXX
 AX_BOOST_BASE([1.41])
