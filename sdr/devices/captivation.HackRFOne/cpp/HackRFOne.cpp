@@ -39,7 +39,7 @@ HackRFOne_i::HackRFOne_i(char *devMgr_ior, char *id, char *lbl, char *sftwrPrfl,
 
 HackRFOne_i::~HackRFOne_i()
 {
-	resetDriver();
+    resetDriver();
 }
 
 void HackRFOne_i::constructor()
@@ -62,16 +62,16 @@ void HackRFOne_i::constructor()
      type. The string for the request must match the string in the tuner status.
     ***********************************************************************************/
 
-	this->setThreadDelay(0.00001);
+    this->setThreadDelay(0.00001);
 
-	// Pre-allocate buffers
+    // Pre-allocate buffers
     _buffers.resize(32);
     for (size_t i = 0; i < _buffers.size(); i++) {
-    	_buffers[i].reserve(262144);
+        _buffers[i].reserve(262144);
     }
 
     // Attempt to locate/instantiate device driver
-	reset();
+    reset();
 
     // Automatically start device
     start();
@@ -82,8 +82,8 @@ void HackRFOne_i::addChannels(size_t num, const std::string& tunerType)
     frontend_tuner_status.resize(frontend_tuner_status.size()+num);
     tuner_allocation_ids.resize(tuner_allocation_ids.size()+num);
     for (std::vector<frontend_tuner_status_struct_struct>::reverse_iterator iter=frontend_tuner_status.rbegin();
-    																		iter!=frontend_tuner_status.rbegin()+num;
-    																		iter++) {
+                                                                            iter!=frontend_tuner_status.rbegin()+num;
+                                                                            iter++) {
         iter->enabled = false;
         iter->tuner_type = tunerType;
     }
@@ -91,24 +91,24 @@ void HackRFOne_i::addChannels(size_t num, const std::string& tunerType)
 
 bool HackRFOne_i::reset()
 {
-	// Move all pre-allocated buffers into 'available' list
-	_filledBuffers.clear();
-	_availableBuffers.clear();
+    // Move all pre-allocated buffers into 'available' list
+    _filledBuffers.clear();
+    _availableBuffers.clear();
     for (size_t i = 0; i < _buffers.size(); i++) {
-    	_availableBuffers.push_back(&_buffers[i]);
+        _availableBuffers.push_back(&_buffers[i]);
     }
 
-	// Reset the available tuners
-	for (size_t i = 0; i < frontend_tuner_status.size(); i++) {
-		this->removeTunerMapping(i);
-	}
-	this->setNumChannels(0);
+    // Reset the available tuners
+    for (size_t i = 0; i < frontend_tuner_status.size(); i++) {
+        this->removeTunerMapping(i);
+    }
+    this->setNumChannels(0);
 
-	// Attempt to release (if loaded) and re-acquire HackRF device
+    // Attempt to release (if loaded) and re-acquire HackRF device
     bool deviceReady = resetDriver();
     if (deviceReady) {
-    	this->addChannels(1, "RX_DIGITIZER");
-    	this->addChannels(1, "TX");
+        this->addChannels(1, "RX_DIGITIZER");
+        this->addChannels(1, "TX");
     }
     return deviceReady;
 }
@@ -150,33 +150,33 @@ bool HackRFOne_i::resetDriver() {
    }
 
    LOG_INFO(HackRFOne_i, "Successfully opened HackRF device: "
-		                  << serial.part_id[0] << "-"
-		                  << serial.part_id[1] << ":"
-						  << serial.serial_no[0] << "-"
-						  << serial.serial_no[1] << "-"
-						  << serial.serial_no[2] << "-"
-						  << serial.serial_no[3]);
+                          << serial.part_id[0] << "-"
+                          << serial.part_id[1] << ":"
+                          << serial.serial_no[0] << "-"
+                          << serial.serial_no[1] << "-"
+                          << serial.serial_no[2] << "-"
+                          << serial.serial_no[3]);
    return true;
 }
 
 void HackRFOne_i::resetStream(frontend_tuner_status_struct_struct& fts)
 {
-	// Initialize SRI
-	std::string streamId = ossie::generateUUID();
-	_currentSRI = create(streamId, fts);
-	_currentSRI.mode = 1; // Always complex output
+    // Initialize SRI
+    std::string streamId = ossie::generateUUID();
+    _currentSRI = create(streamId, fts);
+    _currentSRI.mode = 1; // Always complex output
 
-	// Initialize starting time-stamp
-	_timestamp = bulkio::time::utils::now();
+    // Initialize starting time-stamp
+    _timestamp = bulkio::time::utils::now();
 
     // Close any existing streams
-	if (!(!_currentStream)) {
-		_currentStream.close();
-		_currentStream = bulkio::OutOctetStream();
-	}
+    if (!(!_currentStream)) {
+        _currentStream.close();
+        _currentStream = bulkio::OutOctetStream();
+    }
 
-	// Initialize the new stream
-	_currentStream = dataOctet_out->createStream(_currentSRI);
+    // Initialize the new stream
+    _currentStream = dataOctet_out->createStream(_currentSRI);
 }
 
 /***********************************************************************************************
@@ -421,23 +421,23 @@ void HackRFOne_i::resetStream(frontend_tuner_status_struct_struct& fts)
 ************************************************************************************************/
 int HackRFOne_i::serviceFunction()
 {
-	// Always service data immediately
-	if (_device && hackrf_is_streaming(_device) == HACKRF_TRUE) {
-		return pushData();
-	}
+    // Always service data immediately
+    if (_device && hackrf_is_streaming(_device) == HACKRF_TRUE) {
+        return pushData();
+    }
 
-	// Not servicing data - Check if device is ready...
-	if (!_device) {
-		reset();
-	}
+    // Not servicing data - Check if device is ready...
+    if (!_device) {
+        reset();
+    }
 
-	// Device driver is ready - Validate it's still accessible
+    // Device driver is ready - Validate it's still accessible
     if (_device) {
-		std::string versionStr(' ', 100);
-		int status = hackrf_version_string_read(_device, &versionStr[0], versionStr.size());
-		if (status != HACKRF_SUCCESS) {
-			reset();
-		}
+        std::string versionStr(' ', 100);
+        int status = hackrf_version_string_read(_device, &versionStr[0], versionStr.size());
+        if (status != HACKRF_SUCCESS) {
+            reset();
+        }
     }
 
     return NOOP;
@@ -445,150 +445,150 @@ int HackRFOne_i::serviceFunction()
 
 int HackRFOne_i::pushData()
 {
-	std::pair< std::vector<unsigned char>*, BULKIO::PrecisionUTCTime> buffer;
+    std::pair< std::vector<unsigned char>*, BULKIO::PrecisionUTCTime> buffer;
 
-	// Find a buffer thats ready
-	{
-		boost::mutex::scoped_lock lock(_filledLock);
-		if (_filledBuffers.empty()) {
-			return NOOP;
-		}
+    // Find a buffer thats ready
+    {
+        boost::mutex::scoped_lock lock(_filledLock);
+        if (_filledBuffers.empty()) {
+            return NOOP;
+        }
 
-		buffer = _filledBuffers.front();
-		_filledBuffers.pop_front();
-	}
+        buffer = _filledBuffers.front();
+        _filledBuffers.pop_front();
+    }
 
     // Ensure we have an active stream to push
-	if (!(!_currentStream)) {
-		_currentStream.write((*buffer.first), buffer.second);
-	}
+    if (!(!_currentStream)) {
+        _currentStream.write((*buffer.first), buffer.second);
+    }
 
-	// Return buffer to available queue
-	{
-		boost::mutex::scoped_lock lock(_availableLock);
-		_availableBuffers.push_back(buffer.first);
-	}
+    // Return buffer to available queue
+    {
+        boost::mutex::scoped_lock lock(_availableLock);
+        _availableBuffers.push_back(buffer.first);
+    }
 
-	return NORMAL;
+    return NORMAL;
 }
 
 int hackrf_rx(hackrf_transfer* transfer)
 {
-	return ((HackRFOne_i*)transfer->rx_ctx)->hackrfRXCallback(transfer);
+    return ((HackRFOne_i*)transfer->rx_ctx)->hackrfRXCallback(transfer);
 }
 
 int HackRFOne_i::hackrfRXCallback(hackrf_transfer* transfer)
 {
-	// Maintain and propagate time-stamp forward
-	//   Propagating BEFORE handling to retain proper timing during data-drops
-	BULKIO::PrecisionUTCTime currentTS = _timestamp;
-	_timestamp = bulkio::time::utils::addSampleOffset(currentTS,
-			                                          transfer->valid_length / 2,
-													  _currentSRI.xdelta);
-	std::vector<unsigned char>* buffer;
-	{
-		boost::mutex::scoped_lock lock(_availableLock);
-		if (_availableBuffers.empty()) {
-			LOG_WARN(HackRFOne_i, "All buffers are currently in use... Dropping data!");
-			return 0;
-		}
-		buffer = _availableBuffers.front();
-		_availableBuffers.pop_front();
-	}
+    // Maintain and propagate time-stamp forward
+    //   Propagating BEFORE handling to retain proper timing during data-drops
+    BULKIO::PrecisionUTCTime currentTS = _timestamp;
+    _timestamp = bulkio::time::utils::addSampleOffset(currentTS,
+                                                      transfer->valid_length / 2,
+                                                      _currentSRI.xdelta);
+    std::vector<unsigned char>* buffer;
+    {
+        boost::mutex::scoped_lock lock(_availableLock);
+        if (_availableBuffers.empty()) {
+            LOG_WARN(HackRFOne_i, "All buffers are currently in use... Dropping data!");
+            return 0;
+        }
+        buffer = _availableBuffers.front();
+        _availableBuffers.pop_front();
+    }
 
-	buffer->clear();
-	buffer->insert(buffer->begin(), &transfer->buffer[0], &transfer->buffer[transfer->valid_length]);
+    buffer->clear();
+    buffer->insert(buffer->begin(), &transfer->buffer[0], &transfer->buffer[transfer->valid_length]);
 
-	LOG_DEBUG(HackRFOne_i, "RECVD HACKRF TRANSFER |"
-			               << " ValidLength=" << transfer->valid_length
-						   << " BufferLength=" << transfer->buffer_length
-						   << " OutputLength=" << buffer->size());
+    LOG_DEBUG(HackRFOne_i, "RECVD HACKRF TRANSFER |"
+                           << " ValidLength=" << transfer->valid_length
+                           << " BufferLength=" << transfer->buffer_length
+                           << " OutputLength=" << buffer->size());
 
-	{
-		boost::mutex::scoped_lock lock(_filledLock);
-		_filledBuffers.push_back(std::make_pair(buffer,currentTS));
-	}
-	return 0;
+    {
+        boost::mutex::scoped_lock lock(_filledLock);
+        _filledBuffers.push_back(std::make_pair(buffer,currentTS));
+    }
+    return 0;
 }
 
 bool HackRFOne_i::updateHackRFSampleRate(frontend_tuner_status_struct_struct &fts,
-		                                 double sampleRate, double tolerance)
+                                         double sampleRate, double tolerance)
 {
-	// Check validity of request and round to nearest valid value
-	fts.sample_rate = sampleRate;
-	if (!withinBounds(fts.sample_rate, tolerance, One::ALLOWED_SAMPLE_RATES)) {
-		LOG_WARN(HackRFOne_i, "Requested sample rate '" << fts.sample_rate << "' is not supported!");
-		return false;
-	}
+    // Check validity of request and round to nearest valid value
+    fts.sample_rate = sampleRate;
+    if (!withinBounds(fts.sample_rate, tolerance, One::ALLOWED_SAMPLE_RATES)) {
+        LOG_WARN(HackRFOne_i, "Requested sample rate '" << fts.sample_rate << "' is not supported!");
+        return false;
+    }
 
-	// Apply sample rate to hackrf device
-	int result = hackrf_set_sample_rate(_device, fts.sample_rate);
-	if (result != HACKRF_SUCCESS) {
-		LOG_WARN(HackRFOne_i, errorString("Failed setting filter bandwidth", result));
-		return false;
-	}
+    // Apply sample rate to hackrf device
+    int result = hackrf_set_sample_rate(_device, fts.sample_rate);
+    if (result != HACKRF_SUCCESS) {
+        LOG_WARN(HackRFOne_i, errorString("Failed setting filter bandwidth", result));
+        return false;
+    }
 
-	return true;
+    return true;
 }
 
 bool HackRFOne_i::updateHackRFBandwidth(frontend_tuner_status_struct_struct &fts,
-		                                double bandwidth, double tolerance)
+                                        double bandwidth, double tolerance)
 {
-	// Check validity of request and round to nearest valid value
-	fts.bandwidth = bandwidth;
-	if (!withinBounds(fts.bandwidth, tolerance, One::ALLOWED_BW_FILTERS)) {
-		LOG_WARN(HackRFOne_i, "Requested bandwidth '" << fts.bandwidth << "' is not supported!");
-		return false;
-	}
+    // Check validity of request and round to nearest valid value
+    fts.bandwidth = bandwidth;
+    if (!withinBounds(fts.bandwidth, tolerance, One::ALLOWED_BW_FILTERS)) {
+        LOG_WARN(HackRFOne_i, "Requested bandwidth '" << fts.bandwidth << "' is not supported!");
+        return false;
+    }
 
-	// Apply bandwidth to hackrf device
-	int result = hackrf_set_baseband_filter_bandwidth(_device, fts.bandwidth);
-	if (result != HACKRF_SUCCESS) {
-		LOG_WARN(HackRFOne_i, errorString("Failed setting filter bandwidth", result));
-		return false;
-	}
+    // Apply bandwidth to hackrf device
+    int result = hackrf_set_baseband_filter_bandwidth(_device, fts.bandwidth);
+    if (result != HACKRF_SUCCESS) {
+        LOG_WARN(HackRFOne_i, errorString("Failed setting filter bandwidth", result));
+        return false;
+    }
 
-	return true;
+    return true;
 }
 
 bool HackRFOne_i::updateHackRFFrequency(frontend_tuner_status_struct_struct &fts,
-		                                double frequency, double tolerance)
+                                        double frequency, double tolerance)
 {
-	// Check validity of request and round to nearest valid value
-	fts.center_frequency = frequency;
-	if (!withinBounds(fts.center_frequency, One::MIN_RF_FREQ, One::MAX_RF_FREQ)) {
-		LOG_WARN(HackRFOne_i, "Requested center frequency '" << fts.center_frequency << "' is not supported!");
-		return false;
-	}
+    // Check validity of request and round to nearest valid value
+    fts.center_frequency = frequency;
+    if (!withinBounds(fts.center_frequency, One::MIN_RF_FREQ, One::MAX_RF_FREQ)) {
+        LOG_WARN(HackRFOne_i, "Requested center frequency '" << fts.center_frequency << "' is not supported!");
+        return false;
+    }
 
-	// Apply frequency to hackrf device
-	int result = hackrf_set_freq(_device, fts.center_frequency);
-	if (result != HACKRF_SUCCESS) {
-		LOG_WARN(HackRFOne_i, errorString("Failed setting frequency", result));
-		return false;
-	}
+    // Apply frequency to hackrf device
+    int result = hackrf_set_freq(_device, fts.center_frequency);
+    if (result != HACKRF_SUCCESS) {
+        LOG_WARN(HackRFOne_i, errorString("Failed setting frequency", result));
+        return false;
+    }
 
-	return true;
+    return true;
 }
 
 bool HackRFOne_i::updateHackRFGainRX(frontend_tuner_status_struct_struct &fts,
-		                             double gain, double tolerance)
+                                     double gain, double tolerance)
 {
-	// Two gain-stages on the HackRF - Attempting to match gain on both stages
-	int gainPerStage = static_cast<int>(gain / 2.0);
+    // Two gain-stages on the HackRF - Attempting to match gain on both stages
+    int gainPerStage = static_cast<int>(gain / 2.0);
 
-	// LNA gain has widest gain-steps so determine
-	int lnaGainFloor = gainPerStage - (gainPerStage % static_cast<int>(One::LNA_STEP_SIZE));
-	double lnaGain = findNearest(lnaGainFloor, One::ALLOWED_LNA_GAIN_VALUES);
+    // LNA gain has widest gain-steps so determine
+    int lnaGainFloor = gainPerStage - (gainPerStage % static_cast<int>(One::LNA_STEP_SIZE));
+    double lnaGain = findNearest(lnaGainFloor, One::ALLOWED_LNA_GAIN_VALUES);
 
-	double vgaGain = (gain - lnaGain);
-	if (!withinBounds(vgaGain, tolerance, One::ALLOWED_RX_VGA_VALUES)) {
-		LOG_WARN(HackRFOne_i, "Requested gain '" << gain << "' is not supported -"
-				              << " (LNA_GAIN_MAX|VGA_GAIN_MAX)="
-							  << One::ALLOWED_LNA_GAIN_VALUES.back() << "|"
-							  << One::ALLOWED_RX_VGA_VALUES.back() << ")");
-		return false;
-	}
+    double vgaGain = (gain - lnaGain);
+    if (!withinBounds(vgaGain, tolerance, One::ALLOWED_RX_VGA_VALUES)) {
+        LOG_WARN(HackRFOne_i, "Requested gain '" << gain << "' is not supported -"
+                              << " (LNA_GAIN_MAX|VGA_GAIN_MAX)="
+                              << One::ALLOWED_LNA_GAIN_VALUES.back() << "|"
+                              << One::ALLOWED_RX_VGA_VALUES.back() << ")");
+        return false;
+    }
 
     int status = hackrf_set_lna_gain(_device, lnaGain);
     if (status != HACKRF_SUCCESS) {
@@ -598,8 +598,8 @@ bool HackRFOne_i::updateHackRFGainRX(frontend_tuner_status_struct_struct &fts,
 
     status = hackrf_set_vga_gain(_device, vgaGain);
     if (status != HACKRF_SUCCESS) {
-    	LOG_WARN(HackRFOne_i, errorString("Failed to set RX-VGA-gain", status).c_str());
-    	return false;
+        LOG_WARN(HackRFOne_i, errorString("Failed to set RX-VGA-gain", status).c_str());
+        return false;
     }
 
     fts.gain = lnaGain + vgaGain;
@@ -607,10 +607,10 @@ bool HackRFOne_i::updateHackRFGainRX(frontend_tuner_status_struct_struct &fts,
 }
 
 bool HackRFOne_i::updateHackRFGainTX(frontend_tuner_status_struct_struct &fts,
-		                             double gain, double tolerance)
+                                     double gain, double tolerance)
 {
-	// TODO: Populate TX gain
-	return false;
+    // TODO: Populate TX gain
+    return false;
 }
 
 /*************************************************************
@@ -622,18 +622,18 @@ void HackRFOne_i::deviceEnable(frontend_tuner_status_struct_struct &fts, size_t 
     Make sure to set the 'enabled' member of fts to indicate that tuner as enabled
     ************************************************************/
 
-	// Reset the stream for this tuner
-	resetStream(fts);
+    // Reset the stream for this tuner
+    resetStream(fts);
 
-	// Setup 'reasonable' gain as default
-	updateHackRFGainRX(fts, One::DEFAULT_LNA_GAIN+One::DEFAULT_VGA_GAIN, 100.0);
+    // Setup 'reasonable' gain as default
+    updateHackRFGainRX(fts, One::DEFAULT_LNA_GAIN+One::DEFAULT_VGA_GAIN, 100.0);
 
-	// Enable RX on the hardware
-	if (fts.tuner_type == "RX_DIGITIZER") {
-		hackrf_start_rx(_device, hackrf_rx, this);
-	}
+    // Enable RX on the hardware
+    if (fts.tuner_type == "RX_DIGITIZER") {
+        hackrf_start_rx(_device, hackrf_rx, this);
+    }
 
-	// TODO: Add TX
+    // TODO: Add TX
 
     fts.enabled = true;
     return;
@@ -644,14 +644,14 @@ void HackRFOne_i::deviceDisable(frontend_tuner_status_struct_struct &fts, size_t
     modify fts, which corresponds to this->frontend_tuner_status[tuner_id]
     Make sure to reset the 'enabled' member of fts to indicate that tuner as disabled
     ************************************************************/
-	if (fts.tuner_type == "RX_DIGITIZER") hackrf_stop_rx(_device);
-	if (fts.tuner_type == "TX") hackrf_stop_tx(_device);
+    if (fts.tuner_type == "RX_DIGITIZER") hackrf_stop_rx(_device);
+    if (fts.tuner_type == "TX") hackrf_stop_tx(_device);
 
-	// Close the current stream
-	if (!(!_currentStream)) {
-		_currentStream.close();
-		_currentStream = bulkio::OutOctetStream();
-	}
+    // Close the current stream
+    if (!(!_currentStream)) {
+        _currentStream.close();
+        _currentStream = bulkio::OutOctetStream();
+    }
 
     fts.enabled = false;
     return;
@@ -669,17 +669,17 @@ bool HackRFOne_i::deviceSetTuning(const frontend::frontend_tuner_allocation_stru
 
     return true if the tuning succeeded, and false if it failed
     ************************************************************/
-	bool success = true;
-	success &= updateHackRFBandwidth(fts, request.bandwidth, request.bandwidth_tolerance);
-	success &= updateHackRFSampleRate(fts, request.sample_rate, request.sample_rate_tolerance);
-	success &= updateHackRFFrequency(fts, request.center_frequency, 0.0);
+    bool success = true;
+    success &= updateHackRFBandwidth(fts, request.bandwidth, request.bandwidth_tolerance);
+    success &= updateHackRFSampleRate(fts, request.sample_rate, request.sample_rate_tolerance);
+    success &= updateHackRFFrequency(fts, request.center_frequency, 0.0);
 
-	if (success) {
-		LOG_INFO(HackRFOne_i, "Successfully configured HackRF with (SR|BW|FREQ)=("
-						      << uint64_t(fts.sample_rate) << "|"
-						      << uint64_t(fts.bandwidth) << "|"
-						      << uint64_t(fts.center_frequency) << ")");
-	}
+    if (success) {
+        LOG_INFO(HackRFOne_i, "Successfully configured HackRF with (SR|BW|FREQ)=("
+                              << uint64_t(fts.sample_rate) << "|"
+                              << uint64_t(fts.bandwidth) << "|"
+                              << uint64_t(fts.center_frequency) << ")");
+    }
     return success;
 }
 
@@ -727,10 +727,10 @@ void HackRFOne_i::setTunerCenterFrequency(const std::string& allocation_id, doub
         throw FRONTEND::FrontendException(("ID "+allocation_id+" does not have authorization to modify the tuner").c_str());
     if (freq<0) throw FRONTEND::BadParameterException("Center frequency cannot be less than 0");
 
-	bool success = updateHackRFFrequency(this->frontend_tuner_status[idx], freq, 0.0);
-	if (!success) {
-		throw FRONTEND::BadParameterException("Failed to update center frequency");
-	}
+    bool success = updateHackRFFrequency(this->frontend_tuner_status[idx], freq, 0.0);
+    if (!success) {
+        throw FRONTEND::BadParameterException("Failed to update center frequency");
+    }
     resetStream(this->frontend_tuner_status[idx]);
 }
 
@@ -749,7 +749,7 @@ void HackRFOne_i::setTunerBandwidth(const std::string& allocation_id, double bw)
 
     bool success = updateHackRFBandwidth(this->frontend_tuner_status[idx], bw, 20.0);
     if (!success) {
-    	throw FRONTEND::BadParameterException("Failed to update bandwidth");
+        throw FRONTEND::BadParameterException("Failed to update bandwidth");
     }
     resetStream(this->frontend_tuner_status[idx]);
 }
@@ -780,17 +780,17 @@ void HackRFOne_i::setTunerGain(const std::string& allocation_id, float gain)
 
     // Update for RX_DIGITIZER tuner
     if (frontend_tuner_status[idx].tuner_type == "RX_DIGITIZER") {
-    	bool success = updateHackRFGainRX(this->frontend_tuner_status[idx], gain, 20.0);
-    	if (!success) {
-    		float maxGain = One::ALLOWED_RX_VGA_VALUES.back() + One::ALLOWED_LNA_GAIN_VALUES.back();
-    		std::stringstream ss;
-    		ss << "RX-gain cannot be greater than " << maxGain << " dB";
-    		throw FRONTEND::BadParameterException(ss.str().c_str());
-    	}
+        bool success = updateHackRFGainRX(this->frontend_tuner_status[idx], gain, 20.0);
+        if (!success) {
+            float maxGain = One::ALLOWED_RX_VGA_VALUES.back() + One::ALLOWED_LNA_GAIN_VALUES.back();
+            std::stringstream ss;
+            ss << "RX-gain cannot be greater than " << maxGain << " dB";
+            throw FRONTEND::BadParameterException(ss.str().c_str());
+        }
     }
 
     if (frontend_tuner_status[idx].tuner_type == "RX_DIGITIZER") {
-    	// TODO: Implement TX gain
+        // TODO: Implement TX gain
     }
 }
 
@@ -818,9 +818,9 @@ void HackRFOne_i::setTunerEnable(const std::string& allocation_id, bool enable) 
         throw FRONTEND::FrontendException(("ID "+allocation_id+" does not have authorization to modify the tuner").c_str());
 
     if (enable) {
-    	deviceEnable(this->frontend_tuner_status[idx], idx);
+        deviceEnable(this->frontend_tuner_status[idx], idx);
     } else {
-    	deviceDisable(this->frontend_tuner_status[idx], idx);
+        deviceDisable(this->frontend_tuner_status[idx], idx);
     }
 }
 
@@ -839,7 +839,7 @@ void HackRFOne_i::setTunerOutputSampleRate(const std::string& allocation_id, dou
 
     bool success = updateHackRFSampleRate(this->frontend_tuner_status[idx], sr, 20.0);
     if (!success) {
-    	throw FRONTEND::BadParameterException("Failed to update sample rate");
+        throw FRONTEND::BadParameterException("Failed to update sample rate");
     }
     resetStream(this->frontend_tuner_status[idx]);
 }
@@ -851,7 +851,7 @@ double HackRFOne_i::getTunerOutputSampleRate(const std::string& allocation_id){
 }
 
 std::string HackRFOne_i::errorString(const std::string& message, int status) {
-	return message + " - Reason: " + hackrf_error_name(static_cast<hackrf_error>(status));
+    return message + " - Reason: " + hackrf_error_name(static_cast<hackrf_error>(status));
 }
 
 
