@@ -3,7 +3,8 @@
 # and choosing Resource Configurations -> Exclude from build. Re-include files
 # by opening the Properties dialog of your project and choosing C/C++ Build ->
 # Tool Chain Editor, and un-checking "Exclude resource from build "
-redhawk_SOURCES_auto = HackRFOne.cpp
+redhawk_SOURCES_auto = HackRFConstants.h
+redhawk_SOURCES_auto += HackRFOne.cpp
 redhawk_SOURCES_auto += HackRFOne.h
 redhawk_SOURCES_auto += HackRFOne_base.cpp
 redhawk_SOURCES_auto += HackRFOne_base.h

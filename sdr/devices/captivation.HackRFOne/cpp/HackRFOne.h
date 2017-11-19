@@ -8,6 +8,7 @@
 class HackRFOne_i : public HackRFOne_base
 {
     ENABLE_LOGGING
+
     public:
         HackRFOne_i(char *devMgr_ior, char *id, char *lbl, char *sftwrPrfl);
         HackRFOne_i(char *devMgr_ior, char *id, char *lbl, char *sftwrPrfl, char *compDev);
@@ -21,9 +22,25 @@ class HackRFOne_i : public HackRFOne_base
 
         bool resetDriver();
 
+        void resetStream(frontend_tuner_status_struct_struct& fts);
+
         void addChannels(size_t num, const std::string& tunerType);
 
         int serviceFunction();
+
+        int pushData();
+
+        int hackrfRXCallback(hackrf_transfer* transfer);
+
+        bool updateHackRFSampleRate(frontend_tuner_status_struct_struct &fts, double sampleRate, double tolerance);
+
+        bool updateHackRFBandwidth(frontend_tuner_status_struct_struct &fts, double bandwidth, double tolerance);
+
+        bool updateHackRFFrequency(frontend_tuner_status_struct_struct &fts, double freq, double tolerance);
+
+        bool updateHackRFGainRX(frontend_tuner_status_struct_struct &fts, double gain, double tolerance);
+
+        bool updateHackRFGainTX(frontend_tuner_status_struct_struct &fts, double gain, double tolerance);
 
     protected:
         std::string getTunerType(const std::string& allocation_id);
@@ -53,6 +70,90 @@ class HackRFOne_i : public HackRFOne_base
 
         //! Pointer to the initialized HackRF device controller
         hackrf_device* _device;
+
+        BULKIO::PrecisionUTCTime _timestamp;
+
+        BULKIO::StreamSRI _currentSRI;
+
+        bulkio::OutOctetStream _currentStream;
+
+        std::vector< std::vector<unsigned char> > _buffers;
+
+        std::deque< std::vector<unsigned char>* > _availableBuffers;
+
+        std::deque< std::pair<std::vector<unsigned char>*, BULKIO::PrecisionUTCTime> > _filledBuffers;
+
+        boost::mutex _availableLock;
+
+        boost::mutex _filledLock;
+
+        BULKIO::StreamSRI createSRI(std::string &stream_id, frontend_tuner_status_struct_struct &frontend_status, double collector_frequency = -1.0);
+
+        std::string errorString(const std::string& message, int status);
+
+        template <typename T>
+		bool withinBounds(T& value, T min, T max, double tolerance=0.0) {
+			T delta = static_cast<T>(value * (tolerance / 100.0));
+			// Only adding tolerance-deltas to avoid negative unsigned types
+			if (((value+delta) >= min) && (value <= (max+delta))) {
+				value = std::max(std::min(value, max), min);
+				return true;
+			}
+			return false;
+		}
+
+		template <typename T>
+		bool withinBounds(T& value, double tolerance, std::vector<T> values) {
+			// Find the nearest value in the set
+			T closestValue = findNearest(value, values);
+
+			// Perform closest-value checks using doubles (for std::fabs)
+			double closestDouble = static_cast<double>(closestValue);
+			double valueDouble = static_cast<double>(value);
+			double maxDelta = valueDouble * (tolerance / 100.0);
+
+			// Check if closest value is within tolerance
+			if (std::fabs(closestDouble-valueDouble) >= maxDelta) {
+				return false;
+			}
+
+			value = closestValue;
+			return true;
+		}
+
+		template <typename T1, typename T2>
+		T1 findNearest(T1 value, std::vector<T2> vals) {
+			assert(vals.empty() == false);
+
+			// Only one value in set - That value is the closest
+			if (vals.size() == 1) return vals[0];
+
+			// Sort values for faster minimum detection
+			std::sort(vals.begin(), vals.end());
+
+			// Perform closest-value checks using doubles (for std::fabs)
+			double doubleValue = static_cast<double>(value);
+
+			// Initial iterative parameters with the first
+			T1 bestValue = static_cast<T1>(vals[0]);
+			double lowestDelta = std::fabs(doubleValue - bestValue);
+
+			// Iterate through remaining data points to find nearest
+			for (size_t i = 1; i < vals.size(); i++) {
+				double v = static_cast<double>(vals[i]);
+				double delta = std::fabs(doubleValue - v);
+				if (delta < lowestDelta) {
+					bestValue = static_cast<T1>(vals[i]);
+					lowestDelta = delta;
+				} else {
+					// Since the values are sorted, any increase in error means
+					// the closest value was found on the previous iteration
+					break;
+				}
+			}
+			return bestValue;
+		}
+
 
         ////////////////////////////////////////
         // Required device specific functions // -- to be implemented by device developer
